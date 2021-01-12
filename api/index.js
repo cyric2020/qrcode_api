@@ -43,6 +43,10 @@ app.post('/qrcode', async (req, res) => {
 
   if(req.body.size >= 3 && req.body.size <= 45){
     size = req.body.size;
+  }else if(req.body.size == ""){
+    size = "";
+  }else if(req.body.size == "auto"){
+    size = "";
   }else{
     res.json( { error: true, detail: "Invalad, size must be 3-45"} );
     return;
@@ -59,7 +63,7 @@ app.post('/qrcode', async (req, res) => {
     res.json( { error: true, detail: "Invalad, margin must be 0-200"} );
     return;
   }
-  if(req.body.expiry >= 10 && req.body.expiry <= 180){
+  if(req.body.expiry >= 10 && req.body.expiry <= 300){
     expiry = req.body.expiry;
   }else{
     res.json( { error: true, detail: "Invalad, expiry must be 10-180"} );
@@ -71,17 +75,31 @@ app.post('/qrcode', async (req, res) => {
     res.json( { error: true, detail: "Invalad detail"} );
     return;
   }
-  var opts = {
-  errorCorrectionLevel: 'H',
-  type: 'image/jpeg',
-  quality: quality,
-  margin: margin,
-  color: {
-    dark:"#000000",
-    light:"#FFFFFF"
-  },
-  version: size
-}
+
+  if(size == ""){
+    var opts = {
+      errorCorrectionLevel: 'H',
+      type: 'image/jpeg',
+      quality: quality,
+      margin: margin,
+      color: {
+        dark:"#000000",
+        light:"#FFFFFF"
+      }
+    }
+  }else{
+    var opts = {
+      errorCorrectionLevel: 'H',
+      type: 'image/jpeg',
+      quality: quality,
+      margin: margin,
+      color: {
+        dark:"#000000",
+        light:"#FFFFFF"
+      },
+      version: size
+    }
+  }
 
   var code = makecode(5);
   if(images.has(code)){
@@ -98,8 +116,7 @@ app.post('/qrcode', async (req, res) => {
     //if(err) throw err;
     var min;
     var error = err + " ";
-    console.log(error);
-    if(error){
+    if(error == undefined){
       min = error.substr(51, 5);
       console.log(min);
       res.json( { error: true, detail: `Minimum size must be ${min} to be able to store the current data amount.` } );
