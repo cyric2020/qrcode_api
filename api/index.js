@@ -3,7 +3,8 @@ const path = require('path');
 const express = require('express');
 const QRCode = require('qrcode');
 const utils = path.join(__dirname, "utils");
-const app = express();
+//router = express.Router(); // active in production
+router = express();          // active in dev
 const port = process.env.PORT || 3002;
 const HashMap = require("hashmap");
 const bodyParser = require('body-parser');
@@ -20,11 +21,11 @@ function makecode(length) {
    return result;
 }
 
-app.disable('x-powered-by');
-app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: true }));
+router.disable('x-powered-by');
+router.use('/public', express.static(path.join(__dirname, 'public')));
+router.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/images/:id', (req, res) => {
+router.get('/images/:id', (req, res) => {
   var id = req.params.id;
   if(id){
     if(images.has(id) == false){
@@ -37,7 +38,7 @@ app.get('/images/:id', (req, res) => {
   }
 });
 
-app.post('/qrcode', async (req, res) => {
+router.post('/qrcode', async (req, res) => {
   var size, quality, margin, dark, light, detail, expiry;
   var type; //maby?
 
@@ -161,4 +162,6 @@ fs.readdir(directory, (err, files) => {
   }
 });
 
-app.listen(port);
+//module.exports = router; // active in production
+
+router.listen(80);         // active in dev
